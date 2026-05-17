@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Climate Folks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a08;
+    --white: #f4f2ec;
+    --acid: #c8f135;
+    --acid-dim: #a0c020;
+    --mid: #1e1e1a;
+    --border: rgba(200,241,53,0.18);
+    --text-muted: #7a7a6e;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 3rem;
+    border-bottom: 0.5px solid var(--border);
+    background: rgba(10,10,8,0.85);
+    backdrop-filter: blur(12px);
+  }
+  .nav-logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    color: var(--acid);
+    text-transform: uppercase;
+  }
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+  .nav-cta {
+    background: var(--acid);
+    color: var(--black);
+    border: none;
+    padding: 0.55rem 1.4rem;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .nav-cta:hover { opacity: 0.85; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 0 3rem 5rem;
+    position: relative;
+    border-bottom: 0.5px solid var(--border);
+    overflow: hidden;
+  }
+
+  .hero-bg-text {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 38vw;
+    color: rgba(200,241,53,0.04);
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+    line-height: 0.9;
+  }
+
+  .hero-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--acid);
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    display: flex; align-items: center; gap: 0.8rem;
+  }
+  .hero-tag::before {
+    content: '';
+    width: 32px; height: 1px;
+    background: var(--acid);
+    display: inline-block;
+  }
+
+  .hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 13vw, 14rem);
+    line-height: 0.88;
+    letter-spacing: -0.01em;
+    color: var(--white);
+    margin-bottom: 3rem;
+    position: relative;
+  }
+  .hero h1 .accent { color: var(--acid); }
+
+  .hero-bottom {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 2rem;
+  }
+  .hero-desc {
+    max-width: 480px;
+    font-size: 18px;
+    font-weight: 300;
+    color: rgba(244,242,236,0.72);
+    line-height: 1.6;
+  }
+  .hero-desc strong { color: var(--white); font-weight: 600; }
+
+  .hero-stats {
+    display: flex; gap: 3rem;
+    flex-shrink: 0;
+  }
+  .stat { text-align: right; }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem;
+    color: var(--acid);
+    line-height: 1;
+    display: block;
+  }
+  .stat-label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-family: 'DM Mono', monospace;
+    display: block;
+    margin-top: 0.2rem;
+  }
+
+  /* SCROLL TICKER */
+  .ticker {
+    background: var(--acid);
+    color: var(--black);
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 0.85rem 0;
+  }
+  .ticker-inner {
+    display: inline-block;
+    animation: ticker 25s linear infinite;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* SECTIONS */
+  section {
+    padding: 7rem 3rem;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--acid);
+    text-transform: uppercase;
+    margin-bottom: 4rem;
+    display: flex; align-items: center; gap: 0.8rem;
+  }
+  .section-label::before {
+    content: '';
+    width: 24px; height: 1px;
+    background: var(--acid);
+    display: inline-block;
+  }
+
+  /* MANIFESTO */
+  .manifesto-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.8rem, 5.5vw, 6rem);
+    line-height: 1.05;
+    color: var(--white);
+    max-width: 1100px;
+  }
+  .manifesto-text .muted { color: var(--text-muted); }
+  .manifesto-text .acid { color: var(--acid); }
+
+  .manifesto-aside {
+    margin-top: 5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    border: 0.5px solid var(--border);
+  }
+  .manifesto-aside-item {
+    padding: 2.5rem;
+    border-right: 0.5px solid var(--border);
+  }
+  .manifesto-aside-item:last-child { border-right: none; }
+  .manifesto-aside-item h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    color: var(--acid);
+    margin-bottom: 0.8rem;
+    letter-spacing: 0.02em;
+  }
+  .manifesto-aside-item p {
+    font-size: 14px;
+    color: rgba(244,242,236,0.65);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* HOW IT WORKS */
+  .how-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: start;
+  }
+  .how-left h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 5vw, 5.5rem);
+    line-height: 1;
+    color: var(--white);
+    margin-bottom: 2rem;
+  }
+  .how-left h2 span { color: var(--acid); }
+  .how-left p {
+    color: rgba(244,242,236,0.65);
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 1.75;
+    margin-bottom: 1.5rem;
+  }
+  .how-left p strong { color: var(--white); font-weight: 600; }
+
+  .how-right { padding-top: 1rem; }
+  .how-step {
+    display: flex; gap: 1.8rem;
+    padding: 2rem 0;
+    border-bottom: 0.5px solid var(--border);
+    align-items: flex-start;
+  }
+  .how-step:first-child { border-top: 0.5px solid var(--border); }
+  .step-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--acid);
+    letter-spacing: 0.12em;
+    min-width: 32px;
+    padding-top: 4px;
+  }
+  .step-content h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 0.4rem;
+    letter-spacing: 0.02em;
+  }
+  .step-content p {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  /* PILLARS */
+  .pillars-heading {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 5vw, 5rem);
+    color: var(--white);
+    margin-bottom: 4rem;
+    line-height: 1;
+    max-width: 700px;
+  }
+
+  .pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 0.5px solid var(--border);
+    margin-bottom: 4rem;
+  }
+  .pillar {
+    background: var(--black);
+    padding: 3rem 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+    cursor: default;
+  }
+  .pillar:hover { background: var(--mid); }
+  .pillar-icon {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 6rem;
+    color: rgba(200,241,53,0.12);
+    position: absolute;
+    top: -10px; right: -10px;
+    line-height: 1;
+    pointer-events: none;
+    transition: color 0.3s;
+  }
+  .pillar:hover .pillar-icon { color: rgba(200,241,53,0.22); }
+  .pillar-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--acid);
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+    display: block;
+  }
+  .pillar h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem;
+    color: var(--white);
+    margin-bottom: 1.2rem;
+    line-height: 1;
+  }
+  .pillar p {
+    font-size: 13px;
+    color: rgba(244,242,236,0.55);
+    font-weight: 300;
+    line-height: 1.7;
+  }
+  .pillar ul {
+    list-style: none;
+    margin-top: 1.5rem;
+  }
+  .pillar ul li {
+    font-size: 12px;
+    color: rgba(244,242,236,0.45);
+    padding: 0.35rem 0;
+    border-bottom: 0.5px solid rgba(200,241,53,0.08);
+    display: flex; align-items: center; gap: 0.5rem;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.04em;
+  }
+  .pillar ul li::before {
+    content: '→';
+    color: var(--acid);
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  /* CROSS-ENGAGEMENT VISUAL */
+  .cross-section {
+    background: var(--mid);
+    position: relative;
+  }
+  .cross-visual {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+  .cross-text h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 4vw, 4.5rem);
+    color: var(--white);
+    line-height: 1.02;
+    margin-bottom: 2rem;
+  }
+  .cross-text h2 span { color: var(--acid); }
+  .cross-text p {
+    font-size: 15px;
+    color: rgba(244,242,236,0.62);
+    line-height: 1.75;
+    font-weight: 300;
+    margin-bottom: 1.2rem;
+  }
+  .cross-text p strong { color: var(--white); font-weight: 600; }
+
+  .cross-matrix {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .matrix-cell {
+    aspect-ratio: 1;
+    border: 0.5px solid var(--border);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 1rem;
+    position: relative;
+    transition: all 0.3s;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.06em;
+  }
+  .matrix-cell.active {
+    background: rgba(200,241,53,0.08);
+    border-color: rgba(200,241,53,0.4);
+    color: var(--acid);
+  }
+  .matrix-cell.center {
+    background: var(--acid);
+    color: var(--black);
+    font-weight: 600;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .matrix-cell-icon {
+    font-size: 1.4rem;
+    margin-bottom: 0.4rem;
+    line-height: 1;
+  }
+
+  /* WHO FOR */
+  .who-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .who-card {
+    border: 0.5px solid var(--border);
+    padding: 2.5rem 2rem;
+    position: relative;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .who-card:hover {
+    border-color: rgba(200,241,53,0.5);
+    background: rgba(200,241,53,0.03);
+  }
+  .who-card-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 5rem;
+    color: rgba(200,241,53,0.12);
+    position: absolute;
+    top: 1rem; right: 1.5rem;
+    line-height: 1;
+  }
+  .who-card h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    color: var(--white);
+    margin-bottom: 0.8rem;
+    line-height: 1;
+  }
+  .who-card p {
+    font-size: 13px;
+    color: rgba(244,242,236,0.55);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+  .who-card .who-tag {
+    display: inline-block;
+    margin-top: 1.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--acid);
+    text-transform: uppercase;
+    border: 0.5px solid rgba(200,241,53,0.35);
+    padding: 0.3rem 0.75rem;
+  }
+
+  /* CTA */
+  .cta-section {
+    background: var(--acid);
+    color: var(--black);
+    padding: 8rem 3rem;
+    text-align: center;
+    border-bottom: none;
+  }
+  .cta-section .section-label {
+    color: rgba(10,10,8,0.55);
+    justify-content: center;
+  }
+  .cta-section .section-label::before { background: rgba(10,10,8,0.55); }
+  .cta-section h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 9vw, 9rem);
+    color: var(--black);
+    line-height: 0.92;
+    margin-bottom: 2rem;
+    letter-spacing: -0.01em;
+  }
+  .cta-section p {
+    font-size: 18px;
+    color: rgba(10,10,8,0.7);
+    max-width: 540px;
+    margin: 0 auto 3rem;
+    font-weight: 300;
+    line-height: 1.6;
+  }
+  .cta-btn-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .cta-btn-primary {
+    background: var(--black);
+    color: var(--acid);
+    border: none;
+    padding: 1rem 3rem;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .cta-btn-primary:hover { opacity: 0.85; }
+  .cta-btn-secondary {
+    background: transparent;
+    color: var(--black);
+    border: 1.5px solid rgba(10,10,8,0.45);
+    padding: 1rem 3rem;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .cta-btn-secondary:hover { background: rgba(10,10,8,0.08); }
+
+  /* FOOTER */
+  footer {
+    background: var(--black);
+    padding: 3rem;
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 0.5px solid var(--border);
+  }
+  footer .logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    color: var(--acid);
+    text-transform: uppercase;
+  }
+  footer .footer-note {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.06em;
+  }
+
+  /* WHO HEADING */
+  .who-section h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 4vw, 4.5rem);
+    color: var(--white);
+    line-height: 1;
+    max-width: 600px;
+  }
+
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .hero { padding: 0 1.5rem 4rem; }
+    .hero-stats { gap: 1.5rem; }
+    section { padding: 5rem 1.5rem; }
+    .how-grid, .cross-visual { grid-template-columns: 1fr; gap: 3rem; }
+    .pillars-grid { grid-template-columns: 1fr 1fr; }
+    .who-grid { grid-template-columns: 1fr; }
+    .manifesto-aside { grid-template-columns: 1fr; }
+    .manifesto-aside-item { border-right: none; border-bottom: 0.5px solid var(--border); }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+    .hero-bottom { flex-direction: column; align-items: flex-start; }
+    .cross-matrix { max-width: 360px; margin: 0 auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">The Climate Folks</div>
+  <div class="nav-links">
+    <a href="#why">Why</a>
+    <a href="#how">How</a>
+    <a href="#pillars">Network</a>
+    <a href="#who">Who</a>
+  </div>
+  <button class="nav-cta">Join the Network</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-text">TCF</div>
+  <div class="hero-tag">Est. 2025 · Climate Acceleration Network</div>
+  <h1>THE<br><span class="accent">CLIMATE</span><br>FOLKS</h1>
+  <div class="hero-bottom">
+    <p class="hero-desc">
+      A <strong>business-first community</strong> that cuts through the noise.<br>
+      We cross-connect products, services, people, and networks<br>
+      to accelerate real climate action — <strong>collaboratively, commercially, and at scale.</strong>
+    </p>
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-num">0%</span>
+        <span class="stat-label">Bullshit Tolerance</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">∞</span>
+        <span class="stat-label">Network Leverage</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <span class="ticker-inner">
+    Products × Services × People × Networks × Climate Action × Collaboration × Business First × Real Impact × Products × Services × People × Networks × Climate Action × Collaboration × Business First × Real Impact × Products × Services × People × Networks × Climate Action × Collaboration × Business First × Real Impact ×&nbsp;
+  </span>
+</div>
+
+<!-- MANIFESTO -->
+<section id="why">
+  <div class="section-label">The Why</div>
+  <p class="manifesto-text">
+    Climate has a <span class="muted">coordination problem.</span><br>
+    Great products exist. <span class="muted">Smart people exist.</span><br>
+    Capital is moving. <span class="muted">But the dots</span><br>
+    <span class="acid">aren't connecting.</span><br>
+    We fix that.
+  </p>
+
+  <div class="manifesto-aside">
+    <div class="manifesto-aside-item">
+      <h3>No Fluff.</h3>
+      <p>We're not a conference circuit or a LinkedIn group. Every interaction in this community is oriented toward one thing: accelerating climate solutions that work commercially and at scale.</p>
+    </div>
+    <div class="manifesto-aside-item">
+      <h3>Cross-Pollinate.</h3>
+      <p>The breakthroughs happen at the intersections. When a clean energy startup meets a distribution network, when a policy expert connects with a product team — that's when things move.</p>
+    </div>
+    <div class="manifesto-aside-item">
+      <h3>Business First.</h3>
+      <p>Climate action that isn't commercially viable doesn't scale. We back solutions that make business sense, create real value, and pull capital — not just grant money — into the sector.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-label">How It Works</div>
+  <div class="how-grid">
+    <div class="how-left">
+      <h2>Cross-Engagement<br>as a <span>Model</span></h2>
+      <p>Most communities silo people by role or sector. We deliberately don't. The Climate Folks operates as a <strong>living network</strong> — where a clean tech founder, a corporate sustainability head, a climate fund manager, and a B2B SaaS tool all sit in the same room.</p>
+      <p>The leverage comes from <strong>friction between different types</strong>: a product finding its channel, a service finding its customer, a person finding their co-founder, a network finding its cause.</p>
+    </div>
+    <div class="how-right">
+      <div class="how-step">
+        <span class="step-num">01</span>
+        <div class="step-content">
+          <h4>You bring your actual work to the table</h4>
+          <p>No elevator pitches. No performative ESG. Tell us what you're building, what you need, and where you're stuck. That's the starting point.</p>
+        </div>
+      </div>
+      <div class="how-step">
+        <span class="step-num">02</span>
+        <div class="step-content">
+          <h4>The network maps your leverage points</h4>
+          <p>We actively connect you across products, services, people, and networks — not just passively introduce you to "someone interesting."</p>
+        </div>
+      </div>
+      <div class="how-step">
+        <span class="step-num">03</span>
+        <div class="step-content">
+          <h4>Collaboration is structured, not accidental</h4>
+          <p>Curated working groups, deal rooms, co-development sprints, and sector taskforces — built around problems, not personalities.</p>
+        </div>
+      </div>
+      <div class="how-step">
+        <span class="step-num">04</span>
+        <div class="step-content">
+          <h4>Impact compounds across the network</h4>
+          <p>Every successful collaboration strengthens the ecosystem. Your win creates a case study, a relationship, and often a new product or partnership for someone else.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CROSS-ENGAGEMENT VISUAL -->
+<section class="cross-section">
+  <div class="section-label">The Network Effect</div>
+  <div class="cross-visual">
+    <div class="cross-text">
+      <h2>Four Vectors,<br><span>One Goal</span></h2>
+      <p>Climate action is not a single-threaded problem. Our community deliberately spans <strong>four interconnected vectors</strong> — and the magic happens when they collide.</p>
+      <p>A product needs distribution. A service needs clients. A person needs capital. A network needs direction. <strong>We create the collisions.</strong></p>
+    </div>
+    <div class="cross-matrix">
+      <div class="matrix-cell active"><div class="matrix-cell-icon">⚙</div>Products</div>
+      <div class="matrix-cell active"><div class="matrix-cell-icon">⟷</div>Cross<br>Channel</div>
+      <div class="matrix-cell active"><div class="matrix-cell-icon">🛠</div>Services</div>
+      <div class="matrix-cell active"><div class="matrix-cell-icon">⟷</div>Market<br>Access</div>
+      <div class="matrix-cell center">Climate<br>Action</div>
+      <div class="matrix-cell active"><div class="matrix-cell-icon">⟷</div>Co-Build</div>
+      <div class="matrix-cell active"><div class="matrix-cell-icon">◉</div>People</div>
+      <div class="matrix-cell active"><div class="matrix-cell-icon">⟷</div>Network<br>Leverage</div>
+      <div class="matrix-cell active"><div class="matrix-cell-icon">⬡</div>Networks</div>
+    </div>
+  </div>
+</section>
+
+<!-- PILLARS -->
+<section id="pillars">
+  <div class="section-label">The Four Pillars</div>
+  <p class="pillars-heading">What The Community<br>Brings to the Table</p>
+  <div class="pillars-grid">
+    <div class="pillar">
+      <div class="pillar-icon">P</div>
+      <span class="pillar-tag">01 / Products</span>
+      <h3>Climate Products</h3>
+      <p>Hardware, software, data, infrastructure — solutions that reduce, remove, or redirect emissions and build climate resilience.</p>
+      <ul>
+        <li>Clean energy tech</li>
+        <li>Carbon intelligence tools</li>
+        <li>Climate data platforms</li>
+        <li>Sustainable materials</li>
+        <li>Circular economy solutions</li>
+      </ul>
+    </div>
+    <div class="pillar">
+      <div class="pillar-icon">S</div>
+      <span class="pillar-tag">02 / Services</span>
+      <h3>Climate Services</h3>
+      <p>Advisory, finance, legal, communications, and technical services that help climate businesses grow faster and smarter.</p>
+      <ul>
+        <li>Climate finance advisory</li>
+        <li>Sustainability consulting</li>
+        <li>Policy and regulatory</li>
+        <li>Climate communications</li>
+        <li>Technical due diligence</li>
+      </ul>
+    </div>
+    <div class="pillar">
+      <div class="pillar-icon">Pe</div>
+      <span class="pillar-tag">03 / People</span>
+      <h3>Climate Operators</h3>
+      <p>Founders, executives, investors, engineers, scientists, and policymakers who are doing the actual work of shifting the economy.</p>
+      <ul>
+        <li>Cleantech founders</li>
+        <li>Climate investors</li>
+        <li>Sustainability leaders</li>
+        <li>Policy architects</li>
+        <li>Technical talent</li>
+      </ul>
+    </div>
+    <div class="pillar">
+      <div class="pillar-icon">N</div>
+      <span class="pillar-tag">04 / Networks</span>
+      <h3>Aligned Networks</h3>
+      <p>Ecosystems, accelerators, trade bodies, research institutions, and corporate programs that amplify impact beyond the individual.</p>
+      <ul>
+        <li>Climate accelerators</li>
+        <li>Corporate programs</li>
+        <li>Research consortiums</li>
+        <li>Government networks</li>
+        <li>Investor ecosystems</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section class="who-section" id="who">
+  <div class="section-label">Who This Is For</div>
+  <h2>Built for people<br>who ship, not signal.</h2>
+  <div class="who-grid">
+    <div class="who-card">
+      <div class="who-card-num">01</div>
+      <h3>Builders &amp; Founders</h3>
+      <p>You're building a climate product or service and need distribution, capital, strategic partnerships, or just the right 5 people to talk to this quarter.</p>
+      <div class="who-tag">Cleantech / Climate-tech</div>
+    </div>
+    <div class="who-card">
+      <div class="who-card-num">02</div>
+      <h3>Operators &amp; Leaders</h3>
+      <p>You run sustainability inside a large org, or lead a team driving decarbonization. You need tools, vendors, talent, and peer executives who've been there.</p>
+      <div class="who-tag">Corporate / Institutional</div>
+    </div>
+    <div class="who-card">
+      <div class="who-card-num">03</div>
+      <h3>Investors &amp; Advisors</h3>
+      <p>You're allocating capital or expertise toward climate. You want proprietary deal flow, sector intelligence, and co-investors who actually understand the space.</p>
+      <div class="who-tag">Finance / Advisory</div>
+    </div>
+    <div class="who-card">
+      <div class="who-card-num">04</div>
+      <h3>Service Providers</h3>
+      <p>You offer finance, legal, comms, research, or technical services to the climate sector. You need warm introductions, not cold outreach.</p>
+      <div class="who-tag">Professional Services</div>
+    </div>
+    <div class="who-card">
+      <div class="who-card-num">05</div>
+      <h3>Network Leads</h3>
+      <p>You run an accelerator, ecosystem, trade body, or research institution. You want to plug into a cross-sector network and amplify your members' reach.</p>
+      <div class="who-tag">Ecosystem / Institutional</div>
+    </div>
+    <div class="who-card">
+      <div class="who-card-num">06</div>
+      <h3>Transition Catalysts</h3>
+      <p>You come from policy, academia, or an adjacent sector and are actively moving your skills, relationships, and energy into the climate economy.</p>
+      <div class="who-tag">Cross-sector / Transition</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="section-label">Ready?</div>
+  <h2>Stop<br>Watching.<br>Build.</h2>
+  <p>If you're serious about climate action as a business imperative — not a PR exercise — you belong here.</p>
+  <div class="cta-btn-group">
+    <button class="cta-btn-primary">Apply to Join</button>
+    <button class="cta-btn-secondary">Partner With Us</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">The Climate Folks</div>
+  <div class="footer-note">Business-first. No bullshit. Climate always.</div>
+</footer>
+
+</body>
+</html>
