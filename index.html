@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Climate Folks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a08;
+    --white: #f4f2ec;
+    --acid: #c8f135;
+    --mid: #1a1a16;
+    --border: rgba(200,241,53,0.18);
+    --muted: #7a7a6e;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--black); color: var(--white); font-family: 'Space Grotesk', sans-serif; font-size: 16px; line-height: 1.65; overflow-x: hidden; }
+
+  /* NAV */
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 3rem; border-bottom: 0.5px solid var(--border); background: rgba(10,10,8,0.88); backdrop-filter: blur(14px); }
+  .nav-logo { font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 0.12em; color: var(--acid); text-transform: uppercase; }
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 13px; letter-spacing: 0.06em; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--white); }
+  .nav-cta { background: var(--acid); color: var(--black); border: none; padding: 0.55rem 1.4rem; font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
+  .nav-cta:hover { opacity: 0.85; }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    padding-top: 80px;           /* clear fixed nav */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding-left: 3rem;
+    padding-right: 3rem;
+    padding-bottom: 4rem;
+    position: relative;
+    border-bottom: 0.5px solid var(--border);
+    overflow: hidden;
+    gap: 2rem;
+  }
+  #hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+  .hero-scan { position: absolute; inset: 0; pointer-events: none; z-index: 1; background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(200,241,53,0.010) 3px, rgba(200,241,53,0.010) 4px); }
+  .hero-bg-text { position: absolute; top: 50%; left: 48%; transform: translate(-50%,-50%); font-family: 'Bebas Neue', sans-serif; font-size: 42vw; color: rgba(200,241,53,0.025); white-space: nowrap; pointer-events: none; user-select: none; line-height: 0.9; z-index: 0; }
+
+  /* LEFT: text */
+  .hero-left { position: relative; z-index: 2; }
+  .hero-tag { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; color: var(--acid); text-transform: uppercase; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.8rem; }
+  .hero-tag::before { content: ''; width: 28px; height: 1px; background: var(--acid); display: inline-block; }
+  .hero-h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(4.5rem, 9vw, 10rem); line-height: 0.88; letter-spacing: -0.01em; color: var(--white); margin-bottom: 2.5rem; }
+  .hero-h1 .accent { color: var(--acid); }
+  .hero-desc { max-width: 440px; font-size: 17px; font-weight: 300; color: rgba(244,242,236,0.68); line-height: 1.65; margin-bottom: 2.5rem; }
+  .hero-desc strong { color: var(--white); font-weight: 600; }
+  .hero-cta-row { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+  .hero-btn { background: var(--acid); color: var(--black); border: none; padding: 0.85rem 2.2rem; font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
+  .hero-btn:hover { opacity: 0.85; }
+  .hero-btn-ghost { background: transparent; color: var(--white); border: 0.5px solid rgba(244,242,236,0.3); padding: 0.85rem 2.2rem; font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .hero-btn-ghost:hover { border-color: var(--acid); color: var(--acid); }
+  .hero-stats { display: flex; gap: 2.5rem; margin-top: 3.5rem; padding-top: 2rem; border-top: 0.5px solid var(--border); }
+  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; color: var(--acid); line-height: 1; display: block; }
+  .stat-label { font-size: 10px; letter-spacing: 0.14em; color: var(--muted); text-transform: uppercase; font-family: 'DM Mono', monospace; display: block; margin-top: 0.2rem; }
+
+  /* RIGHT: hero graphics panel */
+  .hero-right {
+    position: relative; z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-self: center;
+  }
+  .hero-card {
+    border: 0.5px solid var(--border);
+    padding: 1.8rem 1.5rem;
+    background: rgba(10,10,8,0.55);
+    backdrop-filter: blur(6px);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, background 0.3s;
+    cursor: default;
+  }
+  .hero-card:hover { border-color: rgba(200,241,53,0.55); background: rgba(200,241,53,0.04); }
+  .hero-card.featured {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; gap: 1.5rem;
+    border-color: rgba(200,241,53,0.35);
+    background: rgba(200,241,53,0.05);
+  }
+  .hero-card-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.2em; color: var(--acid); text-transform: uppercase; margin-bottom: 1rem; display: block; }
+  .hero-card-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; color: var(--white); line-height: 1; margin-bottom: 0.5rem; letter-spacing: 0.02em; }
+  .hero-card p { font-size: 11.5px; color: rgba(244,242,236,0.5); font-weight: 300; line-height: 1.6; }
+  .hero-card-corner { position: absolute; top: 8px; right: 10px; font-family: 'Bebas Neue', sans-serif; font-size: 4rem; color: rgba(200,241,53,0.06); line-height: 1; pointer-events: none; }
+  .hero-card.featured .hero-card-title { font-size: 2rem; }
+  .hero-card.featured .hero-card-text { flex: 1; }
+  /* Pulse dot */
+  .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--acid); position: relative; display: inline-block; flex-shrink: 0; }
+  .pulse-dot::after { content: ''; position: absolute; inset: -4px; border-radius: 50%; border: 1px solid var(--acid); animation: pdot 1.8s ease-out infinite; }
+  @keyframes pdot { 0%{opacity:.8;transform:scale(1)} 100%{opacity:0;transform:scale(2.8)} }
+
+  /* TICKER */
+  .ticker { background: var(--acid); color: var(--black); overflow: hidden; white-space: nowrap; padding: 0.85rem 0; }
+  .ticker-inner { display: inline-block; animation: ticker 28s linear infinite; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; }
+  @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+  /* SECTIONS */
+  section { padding: 7rem 3rem; border-bottom: 0.5px solid var(--border); }
+  .section-label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.2em; color: var(--acid); text-transform: uppercase; margin-bottom: 4rem; display: flex; align-items: center; gap: 0.8rem; }
+  .section-label::before { content: ''; width: 24px; height: 1px; background: var(--acid); display: inline-block; }
+
+  /* WHY / MANIFESTO */
+  .manifesto-layout { display: grid; grid-template-columns: 1fr 300px; gap: 4rem; align-items: start; }
+  .manifesto-text { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.8rem, 5.5vw, 6rem); line-height: 1.05; color: var(--white); }
+  .manifesto-text .muted { color: var(--muted); }
+  .manifesto-text .acid { color: var(--acid); }
+  .globe-wrap { opacity: 0.8; }
+  .globe-wrap svg { width: 100%; }
+  .globe-rotating { transform-origin: 140px 140px; animation: globe-spin 22s linear infinite; }
+  @keyframes globe-spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  @keyframes globe-pulse { 0%,100%{opacity:.7} 50%{opacity:1} }
+  .globe-dot { animation: globe-pulse 2.5s ease-in-out infinite; }
+  .manifesto-aside { margin-top: 5rem; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; border: 0.5px solid var(--border); }
+  .manifesto-aside-item { padding: 2.5rem; border-right: 0.5px solid var(--border); }
+  .manifesto-aside-item:last-child { border-right: none; }
+  .manifesto-aside-item h3 { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--acid); margin-bottom: 0.8rem; }
+  .manifesto-aside-item p { font-size: 14px; color: rgba(244,242,236,0.6); line-height: 1.7; font-weight: 300; }
+
+  /* HOW IT WORKS */
+  .how-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: start; }
+  .how-left h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3rem, 5vw, 5.5rem); line-height: 1; color: var(--white); margin-bottom: 2rem; }
+  .how-left h2 span { color: var(--acid); }
+  .how-left p { color: rgba(244,242,236,0.62); font-size: 16px; font-weight: 300; line-height: 1.75; margin-bottom: 1.5rem; }
+  .how-left p strong { color: var(--white); font-weight: 600; }
+  .how-step { display: flex; gap: 1.8rem; padding: 2rem 0; border-bottom: 0.5px solid var(--border); align-items: flex-start; }
+  .how-step:first-child { border-top: 0.5px solid var(--border); }
+  .step-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--acid); letter-spacing: 0.12em; min-width: 32px; padding-top: 4px; }
+  .step-content h4 { font-size: 15px; font-weight: 600; color: var(--white); margin-bottom: 0.4rem; }
+  .step-content p { font-size: 13px; color: var(--muted); line-height: 1.65; font-weight: 300; }
+
+  /* PILLARS */
+  .pillars-heading { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3rem, 5vw, 5rem); color: var(--white); margin-bottom: 4rem; line-height: 1; max-width: 700px; }
+  .pillars-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 0.5px solid var(--border); }
+  .pillar { background: var(--black); padding: 3rem 2rem; transition: background 0.35s; cursor: default; }
+  .pillar:hover { background: var(--mid); }
+  .pillar-icon-wrap { margin-bottom: 1.5rem; }
+  .pillar-tag { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: var(--acid); text-transform: uppercase; margin-bottom: 0.8rem; display: block; }
+  .pillar h3 { font-family: 'Bebas Neue', sans-serif; font-size: 2.1rem; color: var(--white); margin-bottom: 1rem; line-height: 1; }
+  .pillar p { font-size: 13px; color: rgba(244,242,236,0.52); font-weight: 300; line-height: 1.7; }
+  .pillar ul { list-style: none; margin-top: 1.5rem; }
+  .pillar ul li { font-size: 12px; color: rgba(244,242,236,0.42); padding: 0.35rem 0; border-bottom: 0.5px solid rgba(200,241,53,0.07); display: flex; align-items: center; gap: 0.5rem; font-family: 'DM Mono', monospace; letter-spacing: 0.04em; }
+  .pillar ul li::before { content: '→'; color: var(--acid); font-size: 11px; flex-shrink: 0; }
+
+  /* CROSS-ENGAGEMENT */
+  .cross-section { background: var(--mid); }
+  .cross-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+  .cross-text h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem, 4vw, 4.5rem); color: var(--white); line-height: 1.02; margin-bottom: 2rem; }
+  .cross-text h2 span { color: var(--acid); }
+  .cross-text p { font-size: 15px; color: rgba(244,242,236,0.6); line-height: 1.75; font-weight: 300; margin-bottom: 1.2rem; }
+  .cross-text p strong { color: var(--white); font-weight: 600; }
+  .orbital-wrap { display: flex; align-items: center; justify-content: center; }
+  .orbital-wrap svg { width: 100%; max-width: 480px; }
+
+  /* WHO */
+  .who-section h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem, 4vw, 4.5rem); color: var(--white); line-height: 1; max-width: 600px; }
+  .who-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 3rem; }
+  .who-card { border: 0.5px solid var(--border); padding: 2.5rem 2rem; position: relative; transition: border-color 0.3s, background 0.3s; overflow: hidden; }
+  .who-card:hover { border-color: rgba(200,241,53,0.5); background: rgba(200,241,53,0.03); }
+  .who-card-num { font-family: 'Bebas Neue', sans-serif; font-size: 5rem; color: rgba(200,241,53,0.07); position: absolute; top: 1rem; right: 1.5rem; line-height: 1; }
+  .who-card-icon { display: block; margin-bottom: 1.2rem; }
+  .who-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.75rem; color: var(--white); margin-bottom: 0.8rem; line-height: 1; }
+  .who-card p { font-size: 13px; color: rgba(244,242,236,0.52); line-height: 1.7; font-weight: 300; }
+  .who-tag { display: inline-block; margin-top: 1.5rem; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; color: var(--acid); text-transform: uppercase; border: 0.5px solid rgba(200,241,53,0.35); padding: 0.3rem 0.75rem; }
+
+  /* CTA */
+  .cta-section { background: var(--acid); color: var(--black); padding: 8rem 3rem; text-align: center; border-bottom: none; position: relative; overflow: hidden; }
+  .cta-geo { position: absolute; pointer-events: none; opacity: 0.1; }
+  .cta-geo-tl { top: -60px; left: -60px; }
+  .cta-geo-br { bottom: -60px; right: -60px; transform: rotate(180deg); }
+  .cta-section .section-label { color: rgba(10,10,8,0.5); justify-content: center; }
+  .cta-section .section-label::before { background: rgba(10,10,8,0.5); }
+  .cta-section h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(4rem, 9vw, 9rem); color: var(--black); line-height: 0.92; margin-bottom: 2rem; position: relative; z-index: 1; }
+  .cta-section p { font-size: 18px; color: rgba(10,10,8,0.68); max-width: 540px; margin: 0 auto 3rem; font-weight: 300; line-height: 1.6; position: relative; z-index: 1; }
+  .cta-btn-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
+  .cta-btn-primary { background: var(--black); color: var(--acid); border: none; padding: 1rem 3rem; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
+  .cta-btn-primary:hover { opacity: 0.85; }
+  .cta-btn-secondary { background: transparent; color: var(--black); border: 1.5px solid rgba(10,10,8,0.4); padding: 1rem 3rem; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .cta-btn-secondary:hover { background: rgba(10,10,8,0.07); }
+
+  /* FOOTER */
+  footer { background: var(--black); padding: 3rem; display: flex; align-items: center; justify-content: space-between; border-top: 0.5px solid var(--border); }
+  .footer-logo { font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.16em; color: var(--acid); text-transform: uppercase; }
+  .footer-note { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.06em; }
+
+  @media (max-width: 960px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .hero { grid-template-columns: 1fr; padding: 100px 1.5rem 3rem; }
+    .hero-right { display: none; }
+    section { padding: 5rem 1.5rem; }
+    .how-grid, .cross-layout, .manifesto-layout { grid-template-columns: 1fr; gap: 3rem; }
+    .globe-wrap { display: none; }
+    .pillars-grid { grid-template-columns: 1fr 1fr; }
+    .who-grid { grid-template-columns: 1fr; }
+    .manifesto-aside { grid-template-columns: 1fr; }
+    .manifesto-aside-item { border-right: none; border-bottom: 0.5px solid var(--border); }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">The Climate Folks</div>
+  <div class="nav-links">
+    <a href="#why">Why</a><a href="#how">How</a>
+    <a href="#pillars">Network</a><a href="#who">Who</a>
+  </div>
+  <button class="nav-cta">Join the Network</button>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-scan"></div>
+  <div class="hero-bg-text">TCF</div>
+
+  <!-- LEFT: headline -->
+  <div class="hero-left">
+    <div class="hero-tag">Est. 2025 · Climate Acceleration Network</div>
+    <h1 class="hero-h1">THE<br><span class="accent">CLIMATE</span><br>FOLKS</h1>
+    <p class="hero-desc">A <strong>business-first community</strong> that cuts through the noise. Cross-connecting products, services, people, and networks to accelerate real climate action — <strong>collaboratively, commercially, at scale.</strong></p>
+    <div class="hero-cta-row">
+      <button class="hero-btn">Apply to Join</button>
+      <button class="hero-btn-ghost">Learn More</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">0%</span><span class="stat-label">Bullshit Tolerance</span></div>
+      <div class="stat"><span class="stat-num">4×</span><span class="stat-label">Vectors Connected</span></div>
+      <div class="stat"><span class="stat-num">∞</span><span class="stat-label">Network Leverage</span></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: 4-vector graphic cards -->
+  <div class="hero-right">
+
+    <!-- Featured top card -->
+    <div class="hero-card featured">
+      <span class="pulse-dot"></span>
+      <div class="hero-card-text">
+        <span class="hero-card-label">Network Status</span>
+        <div class="hero-card-title">Cross-Engagement Active</div>
+        <p>Products × Services × People × Networks converging toward a single goal.</p>
+      </div>
+      <!-- mini animated spark SVG -->
+      <svg width="70" height="70" viewBox="0 0 70 70" fill="none" flex-shrink="0">
+        <circle cx="35" cy="35" r="30" stroke="#c8f135" stroke-width="0.7" stroke-opacity="0.3" stroke-dasharray="4 5">
+          <animateTransform attributeName="transform" type="rotate" from="0 35 35" to="360 35 35" dur="18s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="35" cy="35" r="20" stroke="#c8f135" stroke-width="0.5" stroke-opacity="0.2" stroke-dasharray="2.5 4">
+          <animateTransform attributeName="transform" type="rotate" from="360 35 35" to="0 35 35" dur="10s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="35" cy="35" r="6" fill="#c8f135" fill-opacity="0.25" stroke="#c8f135" stroke-width="1.2" stroke-opacity="0.8">
+          <animate attributeName="r" values="6;8;6" dur="3s" repeatCount="indefinite"/>
+          <animate attributeName="fill-opacity" values="0.25;0.45;0.25" dur="3s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="35" cy="5" r="3" fill="#c8f135" fill-opacity="0.7">
+          <animateTransform attributeName="transform" type="rotate" from="0 35 35" to="360 35 35" dur="18s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </div>
+
+    <!-- PRODUCTS card -->
+    <div class="hero-card">
+      <div class="hero-card-corner">P</div>
+      <span class="hero-card-label">01 / Vector</span>
+      <!-- Cube SVG -->
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style="margin-bottom:12px;display:block">
+        <polygon points="24,4 42,14 42,34 24,44 6,34 6,14" fill="rgba(200,241,53,0.07)" stroke="#c8f135" stroke-width="1" stroke-opacity="0.6"/>
+        <polygon points="24,4 42,14 24,24 6,14" fill="rgba(200,241,53,0.14)" stroke="#c8f135" stroke-width="0.8" stroke-opacity="0.7"/>
+        <line x1="24" y1="24" x2="24" y2="44" stroke="#c8f135" stroke-width="0.7" stroke-opacity="0.45"/>
+        <line x1="24" y1="14" x2="34" y2="9" stroke="#c8f135" stroke-width="0.5" stroke-opacity="0.3" stroke-dasharray="2 2"/>
+        <circle cx="34" cy="9" r="2" fill="#c8f135" fill-opacity="0.6"/>
+      </svg>
+      <div class="hero-card-title">Products</div>
+      <p>Clean tech, carbon tools, data platforms</p>
+    </div>
+
+    <!-- SERVICES card -->
+    <div class="hero-card">
+      <div class="hero-card-corner">S</div>
+      <span class="hero-card-label">02 / Vector</span>
+      <!-- Gear SVG -->
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style="margin-bottom:12px;display:block">
+        <circle cx="24" cy="24" r="14" stroke="#c8f135" stroke-width="1" stroke-opacity="0.55" stroke-dasharray="3 3.5"/>
+        <circle cx="24" cy="24" r="6" fill="rgba(200,241,53,0.15)" stroke="#c8f135" stroke-width="1.3" stroke-opacity="0.85"/>
+        <rect x="22" y="7" width="4" height="6" rx="1" fill="#c8f135" fill-opacity="0.55"/>
+        <rect x="22" y="35" width="4" height="6" rx="1" fill="#c8f135" fill-opacity="0.55"/>
+        <rect x="7" y="22" width="6" height="4" rx="1" fill="#c8f135" fill-opacity="0.55"/>
+        <rect x="35" y="22" width="6" height="4" rx="1" fill="#c8f135" fill-opacity="0.55"/>
+        <polygon points="24,38 26,44 22,44" fill="#c8f135" fill-opacity="0.5"/>
+      </svg>
+      <div class="hero-card-title">Services</div>
+      <p>Finance, advisory, policy, legal</p>
+    </div>
+
+    <!-- PEOPLE card -->
+    <div class="hero-card">
+      <div class="hero-card-corner">Pe</div>
+      <span class="hero-card-label">03 / Vector</span>
+      <!-- People network SVG -->
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style="margin-bottom:12px;display:block">
+        <circle cx="24" cy="26" r="7" fill="rgba(200,241,53,0.12)" stroke="#c8f135" stroke-width="1.2" stroke-opacity="0.85"/>
+        <circle cx="24" cy="15" r="5" stroke="#c8f135" stroke-width="0.9" stroke-opacity="0.7"/>
+        <circle cx="10" cy="30" r="5" stroke="#c8f135" stroke-width="0.85" stroke-opacity="0.55"/>
+        <circle cx="38" cy="30" r="5" stroke="#c8f135" stroke-width="0.85" stroke-opacity="0.55"/>
+        <line x1="17" y1="27" x2="14" y2="29" stroke="#c8f135" stroke-width="0.8" stroke-opacity="0.45"/>
+        <line x1="31" y1="27" x2="34" y2="29" stroke="#c8f135" stroke-width="0.8" stroke-opacity="0.45"/>
+        <line x1="4" y1="14" r="2" fill="#c8f135" fill-opacity="0.4"/>
+        <circle cx="5" cy="13" r="2" fill="#c8f135" fill-opacity="0.35"/>
+        <circle cx="43" cy="13" r="2" fill="#c8f135" fill-opacity="0.35"/>
+        <line x1="5" y1="13" x2="9" y2="25" stroke="#c8f135" stroke-width="0.4" stroke-opacity="0.28"/>
+        <line x1="43" y1="13" x2="39" y2="25" stroke="#c8f135" stroke-width="0.4" stroke-opacity="0.28"/>
+      </svg>
+      <div class="hero-card-title">People</div>
+      <p>Founders, investors, operators, scientists</p>
+    </div>
+
+    <!-- NETWORKS card -->
+    <div class="hero-card">
+      <div class="hero-card-corner">N</div>
+      <span class="hero-card-label">04 / Vector</span>
+      <!-- Hex lattice SVG -->
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style="margin-bottom:12px;display:block">
+        <polygon points="24,14 31,18 31,26 24,30 17,26 17,18" fill="rgba(200,241,53,0.15)" stroke="#c8f135" stroke-width="1.3" stroke-opacity="0.9"/>
+        <polygon points="24,3 31,7 31,15 24,19 17,15 17,7" fill="rgba(200,241,53,0.06)" stroke="#c8f135" stroke-width="0.7" stroke-opacity="0.5"/>
+        <polygon points="11,21 18,25 18,33 11,37 4,33 4,25" fill="rgba(200,241,53,0.06)" stroke="#c8f135" stroke-width="0.7" stroke-opacity="0.5"/>
+        <polygon points="37,21 44,25 44,33 37,37 30,33 30,25" fill="rgba(200,241,53,0.06)" stroke="#c8f135" stroke-width="0.7" stroke-opacity="0.5"/>
+        <polygon points="24,29 31,33 31,41 24,45 17,41 17,33" fill="rgba(200,241,53,0.04)" stroke="#c8f135" stroke-width="0.5" stroke-opacity="0.35"/>
+        <circle cx="24" cy="3" r="1.8" fill="#c8f135" fill-opacity="0.7"/>
+        <circle cx="4" cy="33" r="1.5" fill="#c8f135" fill-opacity="0.45"/>
+        <circle cx="44" cy="33" r="1.5" fill="#c8f135" fill-opacity="0.45"/>
+      </svg>
+      <div class="hero-card-title">Networks</div>
+      <p>Accelerators, ecosystems, institutions</p>
+    </div>
+
+  </div><!-- /hero-right -->
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <span class="ticker-inner">Products × Services × People × Networks × Climate Action × Collaboration × Business First × Real Impact × Products × Services × People × Networks × Climate Action × Collaboration × Business First × Real Impact × Products × Services × People × Networks × Climate Action × Collaboration × Business First × Real Impact ×&nbsp;</span>
+</div>
+
+<!-- WHY -->
+<section id="why">
+  <div class="section-label">The Why</div>
+  <div class="manifesto-layout">
+    <p class="manifesto-text">
+      Climate has a <span class="muted">coordination problem.</span><br>
+      Great products exist. <span class="muted">Smart people exist.</span><br>
+      Capital is moving. <span class="muted">But the dots</span><br>
+      <span class="acid">aren't connecting.</span><br>
+      We fix that.
+    </p>
+    <div class="globe-wrap">
+      <svg viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="140" cy="140" r="128" stroke="#c8f135" stroke-width="0.6" stroke-opacity="0.55"/>
+        <g class="globe-rotating">
+          <ellipse cx="140" cy="140" rx="128" ry="28" stroke="#c8f135" stroke-width="0.5" stroke-opacity="0.28"/>
+          <ellipse cx="140" cy="140" rx="128" ry="64" stroke="#c8f135" stroke-width="0.5" stroke-opacity="0.24"/>
+          <ellipse cx="140" cy="140" rx="128" ry="100" stroke="#c8f135" stroke-width="0.5" stroke-opacity="0.2"/>
+          <ellipse cx="140" cy="140" rx="28" ry="128" stroke="#c8f135" stroke-width="0.5" stroke-opacity="0.28"/>
+          <ellipse cx="140" cy="140" rx="64" ry="128" stroke="#c8f135" stroke-width="0.5" stroke-opacity="0.24"/>
+          <ellipse cx="140" cy="140" rx="100" ry="128" stroke="#c8f135" stroke-width="0.5" stroke-opacity="0.2"/>
+        </g>
+        <line x1="12" y1="140" x2="268" y2="140" stroke="#c8f135" stroke-width="0.4" stroke-opacity="0.22"/>
+        <line x1="140" y1="12" x2="140" y2="268" stroke="#c8f135" stroke-width="0.4" stroke-opacity="0.22"/>
+        <circle class="globe-dot" cx="168" cy="90" r="3.5" fill="#c8f135" fill-opacity="0.8"/>
+        <circle cx="105" cy="160" r="2.5" fill="#c8f135" fill-opacity="0.5"/>
+        <circle cx="195" cy="155" r="2" fill="#c8f135" fill-opacity="0.45"/>
+        <circle cx="140" cy="80" r="2" fill="#c8f135" fill-opacity="0.4"/>
+        <circle cx="85" cy="110" r="2" fill="#c8f135" fill-opacity="0.4"/>
+        <circle cx="200" cy="110" r="2" fill="#c8f135" fill-opacity="0.35"/>
+        <line x1="168" y1="90" x2="105" y2="160" stroke="#c8f135" stroke-width="0.6" stroke-opacity="0.4" stroke-dasharray="3 3"/>
+        <line x1="168" y1="90" x2="195" y2="155" stroke="#c8f135" stroke-width="0.6" stroke-opacity="0.35" stroke-dasharray="3 3"/>
+        <line x1="105" y1="160" x2="195" y2="155" stroke="#c8f135" stroke-width="0.4" stroke-opacity="0.28" stroke-dasharray="2 4"/>
+        <line x1="85" y1="110" x2="105" y2="160" stroke="#c8f135" stroke-width="0.4" stroke-opacity="0.28" stroke-dasharray="2 3"/>
+        <circle cx="140" cy="140" r="5" fill="#c8f135" fill-opacity="0.6"/>
+        <circle cx="140" cy="140" r="10" stroke="#c8f135" stroke-width="0.5" stroke-opacity="0.3"/>
+        <text x="140" y="273" text-anchor="middle" fill="#c8f135" fill-opacity="0.35" font-family="'DM Mono', monospace" font-size="9" letter-spacing="2">GLOBAL NETWORK</text>
+      </svg>
+    </div>
+  </div>
+  <div class="manifesto-aside">
+    <div class="manifesto-aside-item"><h3>No Fluff.</h3><p>We're not a conference circuit or a LinkedIn group. Every interaction is oriented toward one thing: accelerating climate solutions that work commercially and at scale.</p></div>
+    <div class="manifesto-aside-item"><h3>Cross-Pollinate.</h3><p>The breakthroughs happen at intersections. When a clean energy startup meets a distribution network, when a policy expert connects with a product team — that's when things move.</p></div>
+    <div class="manifesto-aside-item"><h3>Business First.</h3><p>Climate action that isn't commercially viable doesn't scale. We back solutions that make business sense, create real value, and pull capital — not just grant money — into the sector.</p></div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section id="how">
+  <div class="section-label">How It Works</div>
+  <div class="how-grid">
+    <div class="how-left">
+      <h2>Cross-Engagement<br>as a <span>Model</span></h2>
+      <p>Most communities silo people by role or sector. We deliberately don't. The Climate Folks operates as a <strong>living network</strong> — where a clean tech founder, a corporate sustainability head, a climate fund manager, and a B2B SaaS tool all sit in the same room.</p>
+      <p>The leverage comes from <strong>friction between different types</strong>: a product finding its channel, a service finding its customer, a person finding their co-founder, a network finding its cause.</p>
+      <svg viewBox="0 0 380 220" fill="none" style="margin-top:2.5rem;width:100%" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="60" cy="20" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="100" cy="20" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="140" cy="20" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="180" cy="20" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="220" cy="20" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="260" cy="20" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="300" cy="20" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="340" cy="20" r="1" fill="#c8f135" fill-opacity="0.12"/>
+        <circle cx="20" cy="60" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="60" cy="60" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="100" cy="60" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="140" cy="60" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="180" cy="60" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="220" cy="60" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="260" cy="60" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="300" cy="60" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="340" cy="60" r="1" fill="#c8f135" fill-opacity="0.12"/>
+        <circle cx="20" cy="110" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="60" cy="110" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="100" cy="110" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="140" cy="110" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="180" cy="110" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="220" cy="110" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="260" cy="110" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="300" cy="110" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="340" cy="110" r="1" fill="#c8f135" fill-opacity="0.12"/>
+        <circle cx="20" cy="160" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="140" cy="160" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="260" cy="160" r="1" fill="#c8f135" fill-opacity="0.12"/><circle cx="340" cy="160" r="1" fill="#c8f135" fill-opacity="0.12"/>
+        <rect x="15" y="88" width="70" height="44" rx="2" fill="rgba(200,241,53,0.04)" stroke="#c8f135" stroke-width="0.8" stroke-opacity="0.45"/>
+        <text x="50" y="107" text-anchor="middle" fill="#c8f135" fill-opacity="0.55" font-family="'DM Mono',monospace" font-size="8" letter-spacing="1.5">YOUR</text>
+        <text x="50" y="120" text-anchor="middle" fill="#c8f135" fill-opacity="0.7" font-family="'DM Mono',monospace" font-size="9" letter-spacing="1">WORK</text>
+        <line x1="85" y1="110" x2="135" y2="110" stroke="#c8f135" stroke-width="1.2" stroke-opacity="0.5" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="18" to="0" dur="1.4s" repeatCount="indefinite"/></line>
+        <polygon points="133,106 141,110 133,114" fill="#c8f135" fill-opacity="0.55"/>
+        <rect x="141" y="80" width="88" height="60" rx="2" fill="rgba(200,241,53,0.09)" stroke="#c8f135" stroke-width="1.2" stroke-opacity="0.75"/>
+        <polygon points="185,97 192,101 192,109 185,113 178,109 178,101" fill="none" stroke="#c8f135" stroke-width="0.7" stroke-opacity="0.6"/>
+        <circle cx="185" cy="105" r="3" fill="#c8f135" fill-opacity="0.4"/>
+        <text x="185" y="125" text-anchor="middle" fill="#c8f135" fill-opacity="0.8" font-family="'DM Mono',monospace" font-size="8" letter-spacing="1">NETWORK</text>
+        <line x1="229" y1="110" x2="278" y2="110" stroke="#c8f135" stroke-width="1.2" stroke-opacity="0.5" stroke-dasharray="5 4"><animate attributeName="stroke-dashoffset" from="18" to="0" dur="1.4s" repeatCount="indefinite"/></line>
+        <polygon points="276,106 284,110 276,114" fill="#c8f135" fill-opacity="0.55"/>
+        <rect x="285" y="88" width="72" height="44" rx="2" fill="rgba(200,241,53,0.13)" stroke="#c8f135" stroke-width="1.2" stroke-opacity="0.85"/>
+        <text x="321" y="107" text-anchor="middle" fill="#c8f135" fill-opacity="0.8" font-family="'DM Mono',monospace" font-size="8" letter-spacing="1.5">REAL</text>
+        <text x="321" y="121" text-anchor="middle" fill="#c8f135" fill-opacity="0.95" font-family="'DM Mono',monospace" font-size="9" letter-spacing="1">IMPACT</text>
+      </svg>
+    </div>
+    <div class="how-right">
+      <div class="how-step"><span class="step-num">01</span><div class="step-content"><h4>You bring your actual work to the table</h4><p>No elevator pitches. No performative ESG. Tell us what you're building, what you need, and where you're stuck.</p></div></div>
+      <div class="how-step"><span class="step-num">02</span><div class="step-content"><h4>The network maps your leverage points</h4><p>We actively connect you across products, services, people, and networks — not just passively introduce you to "someone interesting."</p></div></div>
+      <div class="how-step"><span class="step-num">03</span><div class="step-content"><h4>Collaboration is structured, not accidental</h4><p>Curated working groups, deal rooms, co-development sprints, and sector taskforces — built around problems, not personalities.</p></div></div>
+      <div class="how-step"><span class="step-num">04</span><div class="step-content"><h4>Impact compounds across the network</h4><p>Every successful collaboration strengthens the ecosystem. Your win creates a case study, a relationship, and often a new product or partnership for someone else.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CROSS-ENGAGEMENT ORBITAL -->
+<section class="cross-section">
+  <div class="section-label">The Network Effect</div>
+  <div class="cross-layout">
+    <div class="cross-text">
+      <h2>Four Vectors,<br><span>One Goal</span></h2>
+      <p>Climate action is not a single-threaded problem. Our community deliberately spans <strong>four interconnected vectors</strong> — and the magic happens when they collide.</p>
+      <p>A product needs distribution. A service needs clients. A person needs capital. A network needs direction. <strong>We create the collisions.</strong></p>
+    </div>
+    <div class="orbital-wrap">
+      <svg viewBox="0 0 480 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <path id="pTop" d="M240,70 L240,185"/>
+          <path id="pRight" d="M400,200 L255,200"/>
+          <path id="pBottom" d="M240,330 L240,215"/>
+          <path id="pLeft" d="M80,200 L225,200"/>
+        </defs>
+        <ellipse cx="240" cy="200" rx="170" ry="142" stroke="#c8f135" stroke-width="0.5" stroke-opacity="0.1" stroke-dasharray="4 7"/>
+        <line x1="240" y1="70" x2="240" y2="185" stroke="#c8f135" stroke-width="1" stroke-opacity="0.4" stroke-dasharray="6 5"><animate attributeName="stroke-dashoffset" from="22" to="0" dur="2s" repeatCount="indefinite"/></line>
+        <line x1="400" y1="200" x2="255" y2="200" stroke="#c8f135" stroke-width="1" stroke-opacity="0.4" stroke-dasharray="6 5"><animate attributeName="stroke-dashoffset" from="22" to="0" dur="2.6s" repeatCount="indefinite"/></line>
+        <line x1="240" y1="330" x2="240" y2="215" stroke="#c8f135" stroke-width="1" stroke-opacity="0.4" stroke-dasharray="6 5"><animate attributeName="stroke-dashoffset" from="22" to="0" dur="2.2s" repeatCount="indefinite"/></line>
+        <line x1="80" y1="200" x2="225" y2="200" stroke="#c8f135" stroke-width="1" stroke-opacity="0.4" stroke-dasharray="6 5"><animate attributeName="stroke-dashoffset" from="22" to="0" dur="1.8s" repeatCount="indefinite"/></line>
+        <!-- Center -->
+        <circle cx="240" cy="200" r="48" stroke="#c8f135" stroke-width="0.5" stroke-opacity="0.15"><animate attributeName="r" values="48;58;48" dur="3.5s" repeatCount="indefinite"/><animate attributeName="stroke-opacity" values="0.15;0.04;0.15" dur="3.5s" repeatCount="indefinite"/></circle>
+        <circle cx="240" cy="200" r="40" fill="rgba(200,241,53,0.1)" stroke="#c8f135" stroke-width="1.5" stroke-opacity="0.75"><animate attributeName="fill-opacity" values="0.1;0.18;0.1" dur="3.5s" repeatCount="indefinite"/></circle>
+        <text x="240" y="196" text-anchor="middle" fill="#c8f135" font-family="'Bebas Neue', sans-serif" font-size="15" letter-spacing="1.5">CLIMATE</text>
+        <text x="240" y="214" text-anchor="middle" fill="#c8f135" font-family="'Bebas Neue', sans-serif" font-size="15" letter-spacing="1.5">ACTION</text>
+        <!-- Nodes -->
+        <circle cx="240" cy="58" r="30" fill="rgba(200,241,53,0.07)" stroke="#c8f135" stroke-width="1" stroke-opacity="0.55"><animate attributeName="stroke-opacity" values="0.55;1;0.55" dur="3s" repeatCount="indefinite"/></circle>
+        <polygon points="240,44 252,50 252,62 240,68 228,62 228,50" fill="none" stroke="#c8f135" stroke-width="1" stroke-opacity="0.75"/>
+        <polygon points="240,44 252,50 240,56 228,50" fill="rgba(200,241,53,0.15)" stroke="#c8f135" stroke-width="0.5" stroke-opacity="0.5"/>
+        <line x1="240" y1="56" x2="240" y2="68" stroke="#c8f135" stroke-width="0.5" stroke-opacity="0.4"/>
+        <text x="240" y="100" text-anchor="middle" fill="#c8f135" fill-opacity="0.75" font-family="'DM Mono',monospace" font-size="10" letter-spacing="1.5">PRODUCTS</text>
+        <circle cx="412" cy="200" r="30" fill="rgba(200,241,53,0.07)" stroke="#c8f135" stroke-width="1" stroke-opacity="0.55"><animate attributeName="stroke-opacity" values="0.55;1;0.55" dur="3s" begin="0.7s" repeatCount="indefinite"/></circle>
+        <circle cx="412" cy="200" r="10" fill="none" stroke="#c8f135" stroke-width="1.4" stroke-opacity="0.85"/>
+        <circle cx="412" cy="200" r="4" fill="#c8f135" fill-opacity="0.55"/>
+        <rect x="410" y="186" width="4" height="6" rx="1" fill="#c8f135" fill-opacity="0.6"/>
+        <rect x="410" y="208" width="4" height="6" rx="1" fill="#c8f135" fill-opacity="0.6"/>
+        <rect x="398" y="198" width="6" height="4" rx="1" fill="#c8f135" fill-opacity="0.6"/>
+        <rect x="420" y="198" width="6" height="4" rx="1" fill="#c8f135" fill-opacity="0.6"/>
+        <text x="412" y="242" text-anchor="middle" fill="#c8f135" fill-opacity="0.75" font-family="'DM Mono',monospace" font-size="10" letter-spacing="1.5">SERVICES</text>
+        <circle cx="240" cy="342" r="30" fill="rgba(200,241,53,0.07)" stroke="#c8f135" stroke-width="1" stroke-opacity="0.55"><animate attributeName="stroke-opacity" values="0.55;1;0.55" dur="3s" begin="1.4s" repeatCount="indefinite"/></circle>
+        <circle cx="233" cy="334" r="5" fill="rgba(200,241,53,0.12)" stroke="#c8f135" stroke-width="1" stroke-opacity="0.75"/>
+        <circle cx="247" cy="334" r="5" fill="rgba(200,241,53,0.12)" stroke="#c8f135" stroke-width="1" stroke-opacity="0.75"/>
+        <circle cx="240" cy="348" r="6" fill="rgba(200,241,53,0.2)" stroke="#c8f135" stroke-width="1.2" stroke-opacity="0.9"/>
+        <line x1="233" y1="334" x2="247" y2="334" stroke="#c8f135" stroke-width="0.6" stroke-opacity="0.5"/>
+        <line x1="233" y1="334" x2="240" y2="348" stroke="#c8f135" stroke-width="0.6" stroke-opacity="0.5"/>
+        <line x1="247" y1="334" x2="240" y2="348" stroke="#c8f135" stroke-width="0.6" stroke-opacity="0.5"/>
+        <text x="240" y="384" text-anchor="middle" fill="#c8f135" fill-opacity="0.75" font-family="'DM Mono',monospace" font-size="10" letter-spacing="1.5">PEOPLE</text>
+        <circle cx="68" cy="200" r="30" fill="rgba(200,241,53,0.07)" stroke="#c8f135" stroke-width="1" stroke-opacity="0.55"><animate attributeName="stroke-opacity" values="0.55;1;0.55" dur="3s" begin="2.1s" repeatCount="indefinite"/></circle>
+        <polygon points="68,188 76,192 76,200 68,204 60,200 60,192" fill="rgba(200,241,53,0.14)" stroke="#c8f135" stroke-width="1.1" stroke-opacity="0.85"/>
+        <polygon points="76,200 84,204 84,212 76,216 68,212 68,204" fill="rgba(200,241,53,0.07)" stroke="#c8f135" stroke-width="0.6" stroke-opacity="0.5"/>
+        <polygon points="60,200 68,204 68,212 60,216 52,212 52,204" fill="none" stroke="#c8f135" stroke-width="0.5" stroke-opacity="0.35"/>
+        <text x="68" y="242" text-anchor="middle" fill="#c8f135" fill-opacity="0.75" font-family="'DM Mono',monospace" font-size="10" letter-spacing="1.5">NETWORKS</text>
+        <!-- Traveling pulses -->
+        <circle r="3.5" fill="#c8f135"><animateMotion dur="2s" repeatCount="indefinite"><mpath href="#pTop"/></animateMotion><animate attributeName="fill-opacity" values="0;1;1;0" dur="2s" repeatCount="indefinite"/></circle>
+        <circle r="3.5" fill="#c8f135"><animateMotion dur="2.6s" repeatCount="indefinite" begin="0.7s"><mpath href="#pRight"/></animateMotion><animate attributeName="fill-opacity" values="0;1;1;0" dur="2.6s" begin="0.7s" repeatCount="indefinite"/></circle>
+        <circle r="3.5" fill="#c8f135"><animateMotion dur="2.2s" repeatCount="indefinite" begin="1.4s"><mpath href="#pBottom"/></animateMotion><animate attributeName="fill-opacity" values="0;1;1;0" dur="2.2s" begin="1.4s" repeatCount="indefinite"/></circle>
+        <circle r="3.5" fill="#c8f135"><animateMotion dur="1.8s" repeatCount="indefinite" begin="2.1s"><mpath href="#pLeft"/></animateMotion><animate attributeName="fill-opacity" values="0;1;1;0" dur="1.8s" begin="2.1s" repeatCount="indefinite"/></circle>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- PILLARS -->
+<section id="pillars">
+  <div class="section-label">The Four Pillars</div>
+  <p class="pillars-heading">What The Community<br>Brings to the Table</p>
+  <div class="pillars-grid">
+    <div class="pillar">
+      <div class="pillar-icon-wrap"><svg width="72" height="72" viewBox="0 0 72 72" fill="none"><polygon points="36,8 60,20 60,48 36,60 12,48 12,20" fill="rgba(200,241,53,0.06)" stroke="#c8f135" stroke-width="1" stroke-opacity="0.6"/><polygon points="36,8 60,20 36,32 12,20" fill="rgba(200,241,53,0.12)" stroke="#c8f135" stroke-width="0.8" stroke-opacity="0.7"/><line x1="36" y1="32" x2="36" y2="60" stroke="#c8f135" stroke-width="0.7" stroke-opacity="0.5"/><circle cx="50" cy="14" r="2.5" fill="#c8f135" fill-opacity="0.55"/><circle cx="4" cy="28" r="1.5" fill="#c8f135" fill-opacity="0.4"/><circle cx="68" cy="42" r="1.5" fill="#c8f135" fill-opacity="0.4"/></svg></div>
+      <span class="pillar-tag">01 / Products</span><h3>Climate Products</h3>
+      <p>Hardware, software, data, infrastructure — solutions that reduce, remove, or redirect emissions.</p>
+      <ul><li>Clean energy tech</li><li>Carbon intelligence tools</li><li>Climate data platforms</li><li>Sustainable materials</li><li>Circular economy solutions</li></ul>
+    </div>
+    <div class="pillar">
+      <div class="pillar-icon-wrap"><svg width="72" height="72" viewBox="0 0 72 72" fill="none"><circle cx="36" cy="36" r="26" stroke="#c8f135" stroke-width="1" stroke-opacity="0.45" stroke-dasharray="3.5 4"/><circle cx="36" cy="36" r="16" stroke="#c8f135" stroke-width="0.8" stroke-opacity="0.35" stroke-dasharray="2.5 3.5"/><circle cx="36" cy="36" r="6" fill="rgba(200,241,53,0.25)" stroke="#c8f135" stroke-width="1.2" stroke-opacity="0.85"/><polygon points="62,33 66,36 62,39" fill="#c8f135" fill-opacity="0.75"/><polygon points="10,39 6,36 10,33" fill="#c8f135" fill-opacity="0.75"/><polygon points="33,10 36,6 39,10" fill="#c8f135" fill-opacity="0.75"/><polygon points="39,62 36,66 33,62" fill="#c8f135" fill-opacity="0.75"/></svg></div>
+      <span class="pillar-tag">02 / Services</span><h3>Climate Services</h3>
+      <p>Advisory, finance, legal, communications, and technical services that help climate businesses grow.</p>
+      <ul><li>Climate finance advisory</li><li>Sustainability consulting</li><li>Policy and regulatory</li><li>Climate communications</li><li>Technical due diligence</li></ul>
+    </div>
+    <div class="pillar">
+      <div class="pillar-icon-wrap"><svg width="72" height="72" viewBox="0 0 72 72" fill="none"><circle cx="36" cy="38" r="9" fill="rgba(200,241,53,0.15)" stroke="#c8f135" stroke-width="1.3" stroke-opacity="0.9"/><circle cx="36" cy="25" r="6" fill="rgba(200,241,53,0.1)" stroke="#c8f135" stroke-width="0.9" stroke-opacity="0.75"/><circle cx="14" cy="46" r="6.5" fill="rgba(200,241,53,0.08)" stroke="#c8f135" stroke-width="1" stroke-opacity="0.6"/><circle cx="14" cy="35" r="4.5" fill="rgba(200,241,53,0.05)" stroke="#c8f135" stroke-width="0.7" stroke-opacity="0.5"/><circle cx="58" cy="46" r="6.5" fill="rgba(200,241,53,0.08)" stroke="#c8f135" stroke-width="1" stroke-opacity="0.6"/><circle cx="58" cy="35" r="4.5" fill="rgba(200,241,53,0.05)" stroke="#c8f135" stroke-width="0.7" stroke-opacity="0.5"/><line x1="27" y1="40" x2="20" y2="43" stroke="#c8f135" stroke-width="0.9" stroke-opacity="0.5"/><line x1="45" y1="40" x2="52" y2="43" stroke="#c8f135" stroke-width="0.9" stroke-opacity="0.5"/></svg></div>
+      <span class="pillar-tag">03 / People</span><h3>Climate Operators</h3>
+      <p>Founders, executives, investors, engineers, scientists, and policymakers doing the actual work.</p>
+      <ul><li>Cleantech founders</li><li>Climate investors</li><li>Sustainability leaders</li><li>Policy architects</li><li>Technical talent</li></ul>
+    </div>
+    <div class="pillar">
+      <div class="pillar-icon-wrap"><svg width="72" height="72" viewBox="0 0 72 72" fill="none"><polygon points="36,22 46,27 46,38 36,43 26,38 26,27" fill="rgba(200,241,53,0.14)" stroke="#c8f135" stroke-width="1.3" stroke-opacity="0.85"/><polygon points="36,6 46,11 46,22 36,27 26,22 26,11" fill="rgba(200,241,53,0.06)" stroke="#c8f135" stroke-width="0.75" stroke-opacity="0.55"/><polygon points="18,38 28,43 28,54 18,59 8,54 8,43" fill="rgba(200,241,53,0.06)" stroke="#c8f135" stroke-width="0.75" stroke-opacity="0.55"/><polygon points="54,38 64,43 64,54 54,59 44,54 44,43" fill="rgba(200,241,53,0.06)" stroke="#c8f135" stroke-width="0.75" stroke-opacity="0.55"/><circle cx="36" cy="6" r="2" fill="#c8f135" fill-opacity="0.65"/><circle cx="8" cy="43" r="1.5" fill="#c8f135" fill-opacity="0.4"/><circle cx="64" cy="43" r="1.5" fill="#c8f135" fill-opacity="0.4"/></svg></div>
+      <span class="pillar-tag">04 / Networks</span><h3>Aligned Networks</h3>
+      <p>Ecosystems, accelerators, trade bodies, research institutions and corporate programs that amplify impact.</p>
+      <ul><li>Climate accelerators</li><li>Corporate programs</li><li>Research consortiums</li><li>Government networks</li><li>Investor ecosystems</li></ul>
+    </div>
+  </div>
+</section>
+
+<!-- WHO -->
+<section class="who-section" id="who">
+  <div class="section-label">Who This Is For</div>
+  <h2>Built for people<br>who ship, not signal.</h2>
+  <div class="who-grid">
+    <div class="who-card"><div class="who-card-num">01</div><svg class="who-card-icon" width="38" height="38" viewBox="0 0 38 38" fill="none"><rect x="3" y="10" width="32" height="23" rx="2" stroke="#c8f135" stroke-width="1" stroke-opacity="0.6"/><line x1="3" y1="17" x2="35" y2="17" stroke="#c8f135" stroke-width="0.5" stroke-opacity="0.4"/><rect x="10" y="5" width="18" height="7" rx="1" fill="rgba(200,241,53,0.1)" stroke="#c8f135" stroke-width="0.7" stroke-opacity="0.5"/><line x1="8" y1="23" x2="22" y2="23" stroke="#c8f135" stroke-width="1" stroke-opacity="0.55"/><circle cx="28" cy="26" r="4" fill="rgba(200,241,53,0.15)" stroke="#c8f135" stroke-width="0.8" stroke-opacity="0.6"/><line x1="26" y1="26" x2="30" y2="26" stroke="#c8f135" stroke-width="0.8" stroke-opacity="0.7"/><line x1="28" y1="24" x2="28" y2="28" stroke="#c8f135" stroke-width="0.8" stroke-opacity="0.7"/></svg><h3>Builders &amp; Founders</h3><p>You're building a climate product or service and need distribution, capital, partnerships, or just the right 5 people to talk to this quarter.</p><div class="who-tag">Cleantech / Climate-tech</div></div>
+    <div class="who-card"><div class="who-card-num">02</div><svg class="who-card-icon" width="38" height="38" viewBox="0 0 38 38" fill="none"><circle cx="19" cy="19" r="14" stroke="#c8f135" stroke-width="1" stroke-opacity="0.5" stroke-dasharray="3.5 3.5"/><circle cx="19" cy="19" r="7" stroke="#c8f135" stroke-width="0.9" stroke-opacity="0.7"/><circle cx="19" cy="19" r="2.5" fill="#c8f135" fill-opacity="0.7"/><line x1="19" y1="5" x2="19" y2="12" stroke="#c8f135" stroke-width="1.2" stroke-opacity="0.55"/><line x1="19" y1="26" x2="19" y2="33" stroke="#c8f135" stroke-width="1.2" stroke-opacity="0.55"/><line x1="5" y1="19" x2="12" y2="19" stroke="#c8f135" stroke-width="1.2" stroke-opacity="0.55"/><line x1="26" y1="19" x2="33" y2="19" stroke="#c8f135" stroke-width="1.2" stroke-opacity="0.55"/></svg><h3>Operators &amp; Leaders</h3><p>You run sustainability inside a large org. You need tools, vendors, talent, and peer executives who've been there.</p><div class="who-tag">Corporate / Institutional</div></div>
+    <div class="who-card"><div class="who-card-num">03</div><svg class="who-card-icon" width="38" height="38" viewBox="0 0 38 38" fill="none"><line x1="4" y1="34" x2="34" y2="34" stroke="#c8f135" stroke-width="0.8" stroke-opacity="0.5"/><rect x="5" y="24" width="6" height="10" fill="rgba(200,241,53,0.12)" stroke="#c8f135" stroke-width="0.7" stroke-opacity="0.5"/><rect x="16" y="17" width="6" height="17" fill="rgba(200,241,53,0.18)" stroke="#c8f135" stroke-width="0.8" stroke-opacity="0.6"/><rect x="27" y="10" width="6" height="24" fill="rgba(200,241,53,0.28)" stroke="#c8f135" stroke-width="0.9" stroke-opacity="0.8"/><circle cx="30" cy="10" r="2" fill="#c8f135" fill-opacity="0.7"/></svg><h3>Investors &amp; Advisors</h3><p>You're allocating capital or expertise toward climate. You want proprietary deal flow, sector intelligence, and co-investors who get it.</p><div class="who-tag">Finance / Advisory</div></div>
+    <div class="who-card"><div class="who-card-num">04</div><svg class="who-card-icon" width="38" height="38" viewBox="0 0 38 38" fill="none"><circle cx="27" cy="11" r="7" stroke="#c8f135" stroke-width="1" stroke-opacity="0.6" fill="rgba(200,241,53,0.05)"/><line x1="21" y1="17" x2="7" y2="29" stroke="#c8f135" stroke-width="2.8" stroke-opacity="0.6" stroke-linecap="round"/><rect x="4" y="26" width="7" height="6" rx="1" transform="rotate(-45 4 26)" fill="rgba(200,241,53,0.2)" stroke="#c8f135" stroke-width="0.7" stroke-opacity="0.55"/><line x1="24" y1="8" x2="30" y2="8" stroke="#c8f135" stroke-width="1" stroke-opacity="0.4"/><line x1="27" y1="5" x2="27" y2="17" stroke="#c8f135" stroke-width="1" stroke-opacity="0.4"/></svg><h3>Service Providers</h3><p>You offer finance, legal, comms, research, or technical services to the climate sector. You need warm introductions, not cold outreach.</p><div class="who-tag">Professional Services</div></div>
+    <div class="who-card"><div class="who-card-num">05</div><svg class="who-card-icon" width="38" height="38" viewBox="0 0 38 38" fill="none"><circle cx="19" cy="19" r="5" fill="rgba(200,241,53,0.2)" stroke="#c8f135" stroke-width="1.3" stroke-opacity="0.85"/><circle cx="7" cy="10" r="3.5" stroke="#c8f135" stroke-width="0.8" stroke-opacity="0.6"/><circle cx="31" cy="10" r="3.5" stroke="#c8f135" stroke-width="0.8" stroke-opacity="0.6"/><circle cx="7" cy="28" r="3.5" stroke="#c8f135" stroke-width="0.8" stroke-opacity="0.6"/><circle cx="31" cy="28" r="3.5" stroke="#c8f135" stroke-width="0.8" stroke-opacity="0.6"/><line x1="10" y1="12" x2="15" y2="16" stroke="#c8f135" stroke-width="0.6" stroke-opacity="0.45"/><line x1="28" y1="12" x2="23" y2="16" stroke="#c8f135" stroke-width="0.6" stroke-opacity="0.45"/><line x1="10" y1="26" x2="15" y2="22" stroke="#c8f135" stroke-width="0.6" stroke-opacity="0.45"/><line x1="28" y1="26" x2="23" y2="22" stroke="#c8f135" stroke-width="0.6" stroke-opacity="0.45"/></svg><h3>Network Leads</h3><p>You run an accelerator, ecosystem, trade body, or research institution. Plug in and amplify your members' reach across sectors.</p><div class="who-tag">Ecosystem / Institutional</div></div>
+    <div class="who-card"><div class="who-card-num">06</div><svg class="who-card-icon" width="38" height="38" viewBox="0 0 38 38" fill="none"><circle cx="13" cy="19" r="8" stroke="#c8f135" stroke-width="0.9" stroke-opacity="0.55" fill="rgba(200,241,53,0.05)"/><line x1="21" y1="19" x2="32" y2="19" stroke="#c8f135" stroke-width="1.8" stroke-opacity="0.7"/><polygon points="30,15 37,19 30,23" fill="#c8f135" fill-opacity="0.75"/><line x1="22" y1="12" x2="25" y2="16" stroke="#c8f135" stroke-width="0.7" stroke-opacity="0.5"/><line x1="22" y1="26" x2="25" y2="22" stroke="#c8f135" stroke-width="0.7" stroke-opacity="0.5"/></svg><h3>Transition Catalysts</h3><p>You come from policy, academia, or an adjacent sector and are actively moving your energy into the climate economy.</p><div class="who-tag">Cross-sector / Transition</div></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <svg class="cta-geo cta-geo-tl" width="340" height="340" viewBox="0 0 340 340" fill="none"><polygon points="170,20 320,100 320,240 170,320 20,240 20,100" stroke="#0a0a08" stroke-width="2"/><polygon points="170,50 300,120 300,220 170,290 40,220 40,120" stroke="#0a0a08" stroke-width="1.2"/><polygon points="170,90 270,145 270,195 170,250 70,195 70,145" stroke="#0a0a08" stroke-width="0.7"/><circle cx="170" cy="170" r="55" stroke="#0a0a08" stroke-width="0.6"/></svg>
+  <svg class="cta-geo cta-geo-br" width="340" height="340" viewBox="0 0 340 340" fill="none"><polygon points="170,20 320,100 320,240 170,320 20,240 20,100" stroke="#0a0a08" stroke-width="2"/><polygon points="170,50 300,120 300,220 170,290 40,220 40,120" stroke="#0a0a08" stroke-width="1.2"/></svg>
+  <div class="section-label">Ready?</div>
+  <h2>Stop<br>Watching.<br>Build.</h2>
+  <p>If you're serious about climate action as a business imperative — not a PR exercise — you belong here.</p>
+  <div class="cta-btn-group">
+    <button class="cta-btn-primary">Apply to Join</button>
+    <button class="cta-btn-secondary">Partner With Us</button>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">The Climate Folks</div>
+  <div class="footer-note">Business-first. No bullshit. Climate always.</div>
+</footer>
+
+<script>
+(function(){
+  const canvas = document.getElementById('hero-canvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  function resize(){ canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
+  resize();
+  window.addEventListener('resize', ()=>{ resize(); init(); });
+  let pts = [];
+  function init(){
+    pts = [];
+    const n = Math.min(65, Math.floor((canvas.width * canvas.height)/15000));
+    for(let i=0;i<n;i++){
+      const t = Math.random();
+      pts.push({ x:Math.random()*canvas.width, y:Math.random()*canvas.height,
+        vx:(Math.random()-0.5)*0.28, vy:(Math.random()-0.5)*0.28,
+        r:Math.random()*2+0.6, ph:Math.random()*Math.PI*2,
+        sp:Math.random()*0.015+0.007,
+        shape: t<0.2?'diamond':t<0.35?'square':'circle' });
+    }
+  }
+  init();
+  function frame(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for(const p of pts){ p.x+=p.vx; p.y+=p.vy; p.ph+=p.sp;
+      if(p.x<-20)p.x=canvas.width+20; if(p.x>canvas.width+20)p.x=-20;
+      if(p.y<-20)p.y=canvas.height+20; if(p.y>canvas.height+20)p.y=-20; }
+    const D=130;
+    for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){
+      const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y, d=Math.sqrt(dx*dx+dy*dy);
+      if(d<D){ ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y);
+        ctx.strokeStyle=`rgba(200,241,53,${(1-d/D)*0.25})`; ctx.lineWidth=0.4; ctx.stroke(); }
+    }
+    for(const p of pts){
+      const pulse=Math.sin(p.ph)*0.3+0.7, a=0.5*pulse, s=p.r*pulse;
+      if(p.shape==='diamond'){
+        ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(Math.PI/4);
+        ctx.strokeStyle=`rgba(200,241,53,${a*0.85})`; ctx.lineWidth=0.7;
+        ctx.strokeRect(-s*1.5,-s*1.5,s*3,s*3); ctx.restore();
+      } else if(p.shape==='square'){
+        ctx.strokeStyle=`rgba(200,241,53,${a*0.75})`; ctx.lineWidth=0.6;
+        ctx.strokeRect(p.x-s*1.3,p.y-s*1.3,s*2.6,s*2.6);
+      } else {
+        ctx.beginPath(); ctx.arc(p.x,p.y,s,0,Math.PI*2);
+        ctx.fillStyle=`rgba(200,241,53,${a})`; ctx.fill();
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+</script>
+</body>
+</html>
